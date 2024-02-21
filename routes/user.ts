@@ -14,11 +14,11 @@ const validations = [
     .withMessage('Username is required')
     .isLength({ max: 100 })
     .withMessage('Username must be 100 characters or below')
+    .escape()
     .custom(async (username) => {
       const user = await User.findOne({ username });
       if (user) throw new Error('Username already taken');
-    })
-    .escape(),
+    }),
   body('password')
     .isLength({ min: 8, max: 30 })
     .withMessage('Password must be 8 to 30 characters long')
