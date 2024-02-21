@@ -100,13 +100,12 @@ jpCardRouter.get(
       status: 200,
       card: {
         id: card._id.toString(),
+        type: card.type,
         japanese: card.japanese,
         english: card.english,
         kana: card.kana,
-        level: card.level,
         progressive: card.progressive,
         romaji: card.romaji,
-        type: card.type,
         createdAt: card.createdAt,
       },
     });
