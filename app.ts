@@ -3,6 +3,7 @@ import indexRouter from './routes/index';
 import userRouter from './routes/user';
 import errorHandler from './middlewares/errorHandler';
 import createError from 'http-errors';
+import jpCardRouter from './routes/jpcard';
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.urlencoded({ extended: false }));
 // set routers
 app.use('/', indexRouter);
 app.use('/user', userRouter);
+app.use('/jp-card', jpCardRouter);
 app.use((req, res, next) => next(createError(500)));
 app.use(errorHandler);
 
