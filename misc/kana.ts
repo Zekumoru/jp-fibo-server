@@ -1,4 +1,4 @@
-const kanaTable = {
+const kanaTable: Record<string, string> = {
   あ: 'a',
   い: 'i',
   う: 'u',
