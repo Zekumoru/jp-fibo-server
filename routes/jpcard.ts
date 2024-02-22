@@ -26,7 +26,7 @@ const createCard = async ({
 const generalValidation = (chain: ValidationChain, fieldName: string) => {
   return chain
     .trim()
-    .isLength({ min: 0 })
+    .notEmpty()
     .withMessage(`${fieldName} is required`)
     .isLength({ max: 300 })
     .withMessage(`${fieldName} cannot have more than 300 characters`)
@@ -50,8 +50,8 @@ const validations = [
   generalValidation(body('kana'), 'Kana'),
   generalValidation(body('english'), 'English'),
   generalValidation(body('romaji'), 'Romaji'),
-  body('level').customSanitizer((level) => {
-    if (level.trim() === '') return -1;
+  body('level').customSanitizer((level: string | undefined) => {
+    if (level === undefined || level.trim() === '') return -1;
     const processed = Number(level);
     if (isNaN(processed)) return -1;
     return processed;
