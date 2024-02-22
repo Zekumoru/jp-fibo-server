@@ -4,9 +4,11 @@ import userRouter from './routes/user';
 import errorHandler from './middlewares/errorHandler';
 import createError from 'http-errors';
 import jpCardRouter from './routes/jpcard';
+import cors from 'cors';
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
