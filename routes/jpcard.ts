@@ -1,7 +1,8 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { body, validationResult, ValidationChain } from 'express-validator';
 import JPCard, { IJPCard } from '../models/JPCard';
 import asyncHandler from 'express-async-handler';
+import { Types } from 'mongoose';
 
 const jpCardRouter = express.Router();
 
@@ -93,6 +94,35 @@ jpCardRouter.post(
   })
 );
 
+/**
+ * Extracts a JPCard-like object's JPCard's only properties.
+ * @param card A JPCard-like object with extra properties.
+ * @returns JPCard without extra properties.
+ */
+const extractCard = ({
+  _id,
+  createdAt,
+  english,
+  japanese,
+  kana,
+  level,
+  progressive,
+  romaji,
+  type,
+}: IJPCard & { _id: Types.ObjectId }): Omit<IJPCard, '_id'> & {
+  id: string;
+} => ({
+  id: _id.toString(),
+  createdAt,
+  english,
+  japanese,
+  kana,
+  level,
+  progressive,
+  romaji,
+  type,
+});
+
 jpCardRouter.get(
   '/:japanese',
   asyncHandler(async (req, res) => {
@@ -109,21 +139,51 @@ jpCardRouter.get(
 
     res.json({
       status: 200,
-      card: {
-        id: card._id.toString(),
-        type: card.type,
-        japanese: card.japanese,
-        english: card.english,
-        kana: card.kana,
-        progressive: card.progressive,
-        romaji: card.romaji,
-        createdAt: card.createdAt,
-      },
+      card: extractCard(card),
     });
   })
 );
 
-jpCardRouter.get('/', (req, res) => {
+const searchMiddleware = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.query.search) return next();
+    if (typeof req.query.search !== 'string') {
+      res.json({
+        status: 422,
+        message: 'Invalid search string',
+      });
+      return;
+    }
+
+    const search = req.query.search.trim();
+    if (search === '') {
+      res.json({
+        status: 422,
+        message: 'Empty search string',
+      });
+      return;
+    }
+
+    let results: ReturnType<typeof extractCard>[] = [];
+    try {
+      results = (
+        await JPCard.find<IJPCard>({
+          japanese: new RegExp(`^${search}`),
+        }).limit(10)
+      ).map((result) => extractCard(result));
+    } catch (e) {
+      console.log(e);
+    }
+
+    res.json({
+      status: 200,
+      search,
+      results,
+    });
+  }
+);
+
+jpCardRouter.get('/', searchMiddleware, (req, res) => {
   res.json({
     status: 200,
     message: 'Card route',
