@@ -7,6 +7,7 @@ interface IJPCardSchema {
   japanese: string;
   kana: string;
   english: string;
+  progressive: string;
   romaji: string;
   level: number;
   createdAt: Date;
@@ -14,7 +15,6 @@ interface IJPCardSchema {
 
 export interface IJPCard extends IJPCardSchema {
   _id: Types.ObjectId;
-  progressive: string;
 }
 
 const JPCardSchema = new Schema<IJPCardSchema>({
@@ -40,6 +40,12 @@ const JPCardSchema = new Schema<IJPCardSchema>({
     required: true,
     trim: true,
   },
+  progressive: {
+    type: String,
+    maxlength: 300,
+    required: true,
+    trim: true,
+  },
   romaji: {
     type: String,
     maxlength: 300,
@@ -54,41 +60,6 @@ const JPCardSchema = new Schema<IJPCardSchema>({
     type: Date,
     default: Date.now,
   },
-});
-
-JPCardSchema.virtual<IJPCard>('progressive').get(function () {
-  let ip = 0; // index pointer
-  let rip = 0; // romaji index pointer
-  const processed: string[] = [];
-  while (ip < this.kana.length) {
-    // move rip if there are spaces
-    while (this.romaji.charAt(rip) == ' ') {
-      processed.push(' ');
-      rip++;
-    }
-
-    // get kana character
-    let kana: string;
-    if ('ゃゅょャュョ'.includes(this.kana.charAt(ip + 1))) {
-      // check if digraph
-      kana = this.kana.substring(ip, ip + 2);
-      ip += 2;
-    } else {
-      kana = this.kana.substring(ip, ip + 1);
-      ip++;
-    }
-
-    const romaji = kanaTable[kana];
-    const isUnlocked = levels.reduce((isUnlocked, levelChars, level) => {
-      if (level <= this.level && levelChars.includes(kana)) return true;
-      return isUnlocked;
-    }, false);
-    if (isUnlocked) processed.push(kana);
-    else processed.push(romaji);
-    rip += romaji.length;
-  }
-
-  return processed.join('');
 });
 
 export default model('JPCard', JPCardSchema);

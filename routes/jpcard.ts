@@ -11,6 +11,7 @@ const createCard = async ({
   japanese,
   kana,
   romaji,
+  progressive,
   level,
   date,
 }: IJPCard & { date?: string }) => {
@@ -19,6 +20,7 @@ const createCard = async ({
     japanese,
     kana,
     romaji,
+    progressive,
     level,
     createdAt: date ? new Date(date) : undefined,
   });
@@ -52,6 +54,7 @@ const validations = [
   generalValidation(body('kana'), 'Kana'),
   generalValidation(body('english'), 'English'),
   generalValidation(body('romaji'), 'Romaji'),
+  generalValidation(body('progressive'), 'Progressive'),
   body('level')
     .customSanitizer((level: string | undefined) => {
       if (level === '' || level === undefined) return -1;
