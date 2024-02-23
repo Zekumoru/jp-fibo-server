@@ -11,14 +11,15 @@ const createCard = async ({
   kana,
   romaji,
   level,
-}: IJPCard) => {
+  date,
+}: IJPCard & { date?: string }) => {
   const card = new JPCard({
     english,
     japanese,
     kana,
     romaji,
-    level: level ?? -1,
-    createdAt: new Date('2024/02/18 12:00'),
+    level,
+    createdAt: date ? new Date(date) : undefined,
   });
   await card.save();
 };
@@ -50,11 +51,21 @@ const validations = [
   generalValidation(body('kana'), 'Kana'),
   generalValidation(body('english'), 'English'),
   generalValidation(body('romaji'), 'Romaji'),
-  body('level').customSanitizer((level: string | undefined) => {
-    if (level === undefined || level.trim() === '') return -1;
-    const processed = Number(level);
-    if (isNaN(processed)) return -1;
-    return processed;
+  body('level')
+    .customSanitizer((level: string | undefined) => {
+      if (level === '' || level === undefined) return -1;
+      const processed = Number(level);
+      if (isNaN(processed) || level.trim() === '') return NaN;
+      return processed;
+    })
+    .custom((level: number) => {
+      if (isNaN(level)) throw new Error(`Level is not a number`);
+      return true;
+    }),
+  body('date').custom((date: string) => {
+    if (date === undefined || date === '') return true;
+    if (isNaN(new Date(date).getTime())) throw new Error('Invalid date');
+    return true;
   }),
 ];
 
