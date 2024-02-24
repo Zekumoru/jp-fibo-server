@@ -28,7 +28,9 @@ const validations = [
 ];
 
 const createUser = async ({ username, password }: IUser) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
+  let salt = Number(process.env.PASSWORD_SALT);
+  if (isNaN(salt)) salt = 5;
+  const hashedPassword = await bcrypt.hash(password, salt);
   const user = new User({
     username,
     password: hashedPassword,
