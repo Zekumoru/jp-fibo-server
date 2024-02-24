@@ -10,7 +10,7 @@ const validations = [
   body('username')
     .trim()
     .toLowerCase()
-    .isLength({ min: 1 })
+    .notEmpty()
     .withMessage('Username is required')
     .isLength({ max: 100 })
     .withMessage('Username must be 100 characters or below')
@@ -20,6 +20,8 @@ const validations = [
       if (user) throw new Error('Username already taken');
     }),
   body('password')
+    .notEmpty()
+    .withMessage('Password is required')
     .isLength({ min: 8, max: 30 })
     .withMessage('Password must be 8 to 30 characters long')
     .escape(),
