@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { IUser } from '../models/User';
+
+export type UserTokenObj = Pick<IUser, 'username'>;
 
 const jwtCookieAuth = (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -16,12 +19,8 @@ const jwtCookieAuth = (req: Request, res: Response, next: NextFunction) => {
     const user = jwt.verify(
       token,
       process.env.JWT_ACCESS_SECRET ?? 'jwt-access-secret'
-    );
-    console.log(user);
-
-    // req.user = {
-    //   username: user.username;
-    // };
+    ) as UserTokenObj;
+    req.user = { username: user.username };
     next();
   } catch (err) {
     res.status(403).json({
