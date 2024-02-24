@@ -3,7 +3,7 @@ import { body, validationResult, ValidationChain } from 'express-validator';
 import JPCard, { IJPCard } from '../models/JPCard';
 import asyncHandler from 'express-async-handler';
 import { Types } from 'mongoose';
-import jwtCookieAuth from '../middlewares/jwtCookieAuth';
+import jwtAuth from '../middlewares/jwtAuth';
 
 const jpCardRouter = express.Router();
 
@@ -116,7 +116,7 @@ const validations = [
 
 jpCardRouter.post(
   '/create',
-  jwtCookieAuth,
+  jwtAuth,
   ...createValidations,
   ...validations,
   asyncHandler(async (req, res) => {

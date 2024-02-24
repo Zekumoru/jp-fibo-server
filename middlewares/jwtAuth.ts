@@ -4,7 +4,7 @@ import { IUser } from '../models/User';
 
 export type UserTokenObj = Pick<IUser, 'username'>;
 
-const jwtCookieAuth = (req: Request, res: Response, next: NextFunction) => {
+const jwtAuth = (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
@@ -30,4 +30,4 @@ const jwtCookieAuth = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export default jwtCookieAuth;
+export default jwtAuth;
