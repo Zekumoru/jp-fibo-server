@@ -5,6 +5,7 @@ import errorHandler from './middlewares/errorHandler';
 import createError from 'http-errors';
 import jpCardRouter from './routes/jpcard';
 import cors from 'cors';
+import loginRouter from './routes/login';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: false }));
 // set routers
 app.use('/', indexRouter);
 app.use('/user', userRouter);
+app.use('/login', loginRouter);
 app.use('/jp-card', jpCardRouter);
 app.use((req, res, next) => next(createError(500)));
 app.use(errorHandler);
