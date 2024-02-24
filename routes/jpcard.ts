@@ -27,6 +27,35 @@ const createCard = async ({
   await card.save();
 };
 
+const updateCard = async ({
+  english,
+  japanese,
+  kana,
+  romaji,
+  progressive,
+  level,
+  date,
+}: IJPCard & { date?: string }) => {
+  const card = await JPCard.findOne({ japanese });
+  if (!card) {
+    throw new Error(
+      `Could not update '${japanese}', it probably got removed before this operation completed.`
+    );
+  }
+
+  const data: Partial<IJPCard> = {
+    english,
+    japanese,
+    kana,
+    romaji,
+    progressive,
+    level,
+    createdAt: date ? new Date(date) : undefined,
+  };
+  card.overwrite(data);
+  await card.save();
+};
+
 const generalValidation = (chain: ValidationChain, fieldName: string) => {
   return chain
     .trim()
@@ -37,20 +66,31 @@ const generalValidation = (chain: ValidationChain, fieldName: string) => {
     .escape();
 };
 
-const validations = [
+const titleCase = (text: string) =>
+  text.replace(
+    /\w*/g,
+    (token) => token.charAt(0).toUpperCase() + token.substring(1).toLowerCase()
+  );
+
+const createValidations = [
   generalValidation(body('japanese'), 'Japanese')
-    .customSanitizer((japanese: string) =>
-      // Title case
-      japanese.replace(
-        /\w*/g,
-        (token) =>
-          token.charAt(0).toUpperCase() + token.substring(1).toLowerCase()
-      )
-    )
+    .customSanitizer(titleCase)
     .custom(async (japanese) => {
       const card = await JPCard.findOne({ japanese });
       if (card) throw new Error(`Card '${japanese}' already exists`);
     }),
+];
+
+const updateValidations = [
+  generalValidation(body('japanese'), 'Japanese')
+    .customSanitizer(titleCase)
+    .custom(async (japanese) => {
+      const card = await JPCard.findOne({ japanese });
+      if (!card) throw new Error(`Card '${japanese}' does not exist`);
+    }),
+];
+
+const validations = [
   generalValidation(body('kana'), 'Kana'),
   generalValidation(body('english'), 'English'),
   generalValidation(body('romaji'), 'Romaji'),
@@ -75,6 +115,7 @@ const validations = [
 
 jpCardRouter.post(
   '/create',
+  ...createValidations,
   ...validations,
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
@@ -93,6 +134,31 @@ jpCardRouter.post(
     res.status(201).json({
       status: 201,
       message: 'Card has been added successfully.',
+    });
+  })
+);
+
+jpCardRouter.post(
+  '/:japanese/update',
+  ...updateValidations,
+  ...validations,
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      res.status(422).json({
+        status: 422,
+        message: 'Card fields have errors.',
+        errors: errors.mapped(),
+      });
+      return;
+    }
+
+    await updateCard(req.body);
+
+    res.json({
+      status: 200,
+      message: `Card '${req.body.japanese}' has been updated successfully!`,
     });
   })
 );
