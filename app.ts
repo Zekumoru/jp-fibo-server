@@ -3,7 +3,7 @@ import indexRouter from './routes/index';
 import userRouter from './routes/user';
 import errorHandler from './middlewares/errorHandler';
 import createError from 'http-errors';
-import jpCardRouter from './routes/jpcard';
+import jpCardRouter from './routes/jp-card';
 import cors from 'cors';
 import loginRouter from './routes/login';
 
