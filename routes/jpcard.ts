@@ -131,7 +131,7 @@ jpCardRouter.post(
       return;
     }
 
-    // await createCard(req.body);
+    await createCard(req.body);
 
     res.status(201).json({
       status: 201,
