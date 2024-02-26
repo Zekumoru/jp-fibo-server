@@ -1,5 +1,5 @@
 {
-  "name": "fibo-flashcards",
+  "name": "jp-fibo-server",
   "version": "0.0.0",
   "description": "Server side for fibo flashcards.",
   "main": "bin/www.ts",
