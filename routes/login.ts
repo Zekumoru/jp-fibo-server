@@ -1,4 +1,4 @@
-import express, { Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { body } from 'express-validator';
 import User from '../models/User';
 import asyncHandler from 'express-async-handler';
@@ -20,19 +20,34 @@ const sendInvalidCredentials = (res: Response) => {
   });
 };
 
+const handleUserAlreadyLoggedIn = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (req.user?.username) {
+    res.json({
+      status: 200,
+      message: 'User is already logged in!',
+      user: req.user,
+    });
+    return;
+  }
+  next();
+};
+
+loginRouter.get('/', jwtAuth, handleUserAlreadyLoggedIn, (req, res) => {
+  res.json({
+    status: 200,
+    message: 'User is not logged in.',
+    user: null,
+  });
+});
+
 loginRouter.post(
   '/',
   jwtAuth,
-  (req, res, next) => {
-    if (req.user?.username) {
-      res.json({
-        status: 200,
-        message: 'User is already logged in!',
-      });
-      return;
-    }
-    next();
-  },
+  handleUserAlreadyLoggedIn,
   ...validations,
   asyncHandler(async (req, res) => {
     const user = await User.findOne({ username: req.body.username });
@@ -55,6 +70,7 @@ loginRouter.post(
     res.json({
       status: 200,
       message: 'User logged in successfully!',
+      user: { username: user.username },
       token,
     });
   })
