@@ -4,6 +4,7 @@ import User from '../models/User';
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import jwtAuth from '../middlewares/jwtAuth';
 
 const loginRouter = express.Router();
 
@@ -21,6 +22,17 @@ const sendInvalidCredentials = (res: Response) => {
 
 loginRouter.post(
   '/',
+  jwtAuth,
+  (req, res, next) => {
+    if (req.user?.username) {
+      res.json({
+        status: 200,
+        message: 'User is already logged in!',
+      });
+      return;
+    }
+    next();
+  },
   ...validations,
   asyncHandler(async (req, res) => {
     const user = await User.findOne({ username: req.body.username });

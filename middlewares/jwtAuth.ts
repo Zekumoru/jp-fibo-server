@@ -10,13 +10,10 @@ const jwtAuth = (req: JwtRequest, res: Response, next: NextFunction) => {
     // get JWT from cookie
     const accessToken = req.cookies.accessToken;
 
-    // check that the user is logged-in in the client
-    if (accessToken === undefined) {
-      res.status(401).json({
-        status: 401,
-        message: 'You need to be logged in first',
-      });
-      return;
+    // go to next middleware if no access token (this is so if the next
+    // middleware happens to be the handler for logging in)
+    if (!accessToken) {
+      return next();
     }
 
     // verify token
