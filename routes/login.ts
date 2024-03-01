@@ -39,6 +39,7 @@ loginRouter.post(
       { expiresIn: '2d' }
     );
 
+    res.cookie('accessToken', token, { httpOnly: true });
     res.json({
       status: 200,
       message: 'User logged in successfully!',
