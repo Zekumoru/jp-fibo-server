@@ -2,7 +2,7 @@ import express from 'express';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import asyncHandler from 'express-async-handler';
-import User, { IUser } from '../models/User';
+import User, { IUser } from '../../models/User';
 import loginRouter from './login';
 
 const userRouter = express.Router();

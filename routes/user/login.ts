@@ -1,10 +1,10 @@
 import express, { NextFunction, Request, Response } from 'express';
 import { body } from 'express-validator';
-import User from '../models/User';
+import User from '../../models/User';
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import jwtAuth from '../middlewares/jwtAuth';
+import jwtAuth from '../../middlewares/jwtAuth';
 
 const loginRouter = express.Router();
 

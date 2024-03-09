@@ -1,11 +1,11 @@
 import express from 'express';
 import indexRouter from './routes/index';
-import userRouter from './routes/user';
+import userRouter from './routes/user/user';
 import errorHandler from './middlewares/errorHandler';
 import createError from 'http-errors';
 import jpCardRouter from './routes/jp-card';
 import cors from 'cors';
-import loginRouter from './routes/login';
+import loginRouter from './routes/user/login';
 import cookieParser from 'cookie-parser';
 
 const app = express();
