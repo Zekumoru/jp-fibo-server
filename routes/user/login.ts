@@ -5,6 +5,7 @@ import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import jwtAuth from '../../middlewares/jwtAuth';
+import handleUserAlreadyLoggedIn from './handleUserAlreadyLoggedIn';
 
 const loginRouter = express.Router();
 
@@ -18,22 +19,6 @@ const sendInvalidCredentials = (res: Response) => {
     status: 403,
     message: 'Invalid username and/or password',
   });
-};
-
-const handleUserAlreadyLoggedIn = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  if (req.user?.username) {
-    res.json({
-      status: 200,
-      message: 'User is already logged in!',
-      user: req.user,
-    });
-    return;
-  }
-  next();
 };
 
 loginRouter.get('/', jwtAuth, handleUserAlreadyLoggedIn, (req, res) => {
