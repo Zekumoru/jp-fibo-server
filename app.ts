@@ -24,7 +24,6 @@ app.use(cookieParser());
 // set routers
 app.use('/', indexRouter);
 app.use('/user', userRouter);
-app.use('/login', loginRouter);
 app.use('/jp-card', jpCardRouter);
 app.use((req, res, next) => next(createError(500)));
 app.use(errorHandler);

@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import asyncHandler from 'express-async-handler';
 import User, { IUser } from '../models/User';
+import loginRouter from './login';
 
 const userRouter = express.Router();
 
@@ -26,6 +27,8 @@ const validations = [
     .withMessage('Password must be 8 to 30 characters long')
     .escape(),
 ];
+
+userRouter.use('/login', loginRouter);
 
 const createUser = async ({ username, password }: IUser) => {
   let salt = Number(process.env.PASSWORD_SALT);
