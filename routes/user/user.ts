@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import asyncHandler from 'express-async-handler';
 import User, { IUser } from '../../models/User';
 import loginRouter from './login';
+import logoutRouter from './logout';
 
 const userRouter = express.Router();
 
@@ -29,6 +30,7 @@ const validations = [
 ];
 
 userRouter.use('/login', loginRouter);
+userRouter.use('/logout', logoutRouter);
 
 const createUser = async ({ username, password }: IUser) => {
   let salt = Number(process.env.PASSWORD_SALT);
